@@ -24,7 +24,7 @@ find_markers:
     push esi 
     push ebx
 
-    mov [ebp-8], 0              ; set  counter of found markers to 0 
+    mov DWORD[ebp-8], 0              ; set  counter of found markers to 0 
 
 processBMP:
     mov edx, HEIGHT         
@@ -278,18 +278,33 @@ pixelNonBlack4:                                 ; at this point pixel is definit
 
 answerFound:                                    
     ; add column to list
+    ; instrucka lead mov
+    ; obliczyć przesunięcie w ebx, potem dodać je do ebp+12
+    mov eax, DWORD[ebp+12]                           ; load pointer to x positions
+    mov ebx, DWORD[ebp-8]                            ; count of markers
+    mov DWORD[eax + 4*ebx], ecx                          ; [baseAddressOfArray + 4*countOfMarkers]
+
     ; add row to list
+    ; esi - calculate row here 
+    mov esi, HEIGHT - 1
+    sub esi, edx                                    ; row(esi) = HEIGHT - rowIdx - 1
+    mov eax, DWORD[ebp+12]                          ; load pointer to y_positions
+    mov DWORD[eax + 4*ebx], esi                     ; add to array calualted row
+    
     inc DWORD[ebp-8]                            ; increment counter of markers 
 
-
-
-
-    
-
 endOfChecking:
-    mov eax, eax            ; to delete !!!!!!!!!!!
+    add ecx,DWORD[ebp-4]                                    ; adjust column pointer 
+    dec ecx                                        ; -1, because in next step +1 will be added
 continueLoops:
-    mov eax, eax            ; to delete !!!!!!!!!!!
+    inc ecx
+
+    cmp ecx, WIDTH                                      ; check if pointer over column is smaller than width after incrementation
+    jl columnLoop                                       ; if so, continue iteration over columns
+
+    dec edx
+    test edx, edx                                       ; test if edx is zero
+    jnz rowLoop
 
 endFunction:
 
