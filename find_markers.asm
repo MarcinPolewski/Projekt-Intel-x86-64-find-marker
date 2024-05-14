@@ -212,19 +212,32 @@ checkPixelAtTheEndOfVertical:              ; checks if next pixel is not black
 
 endOfBlackLVerticalLoop:                ; at this point black L has been checked and it was correct
 
-    ; adjust lenght of next L-shape
-    ; adjust height of next L-shpa 
+    dec DWORD[ebp-20]                   ; adjust lenght of next L-shape
+    dec DWORD[ebp-24]                   ; adjust height of next L-shpa 
+    
     ; adjust pointer
+    add DWORD[ebp-16], 3
+    sub DWORD[ebp-16],3*WIDTH           ; pointer = pointer + 3 - 3*WDITH - now points to pixel to the right and down 
 
-    ; quit chekcing if vertical lenght == 0 <- thats rectangle 
+    ; quit chekcing if vertical lenght == 0 <- that's rectangle
+    cmp DWORD[ebp-24], 0 
+    je endOfChecking            
+
     jmp checkBlackLLoop
 
 exitBlackLLoop:
-    mov eax, eax                        ; to delete !!!!!!!!!!!!!!!!!!
+    ; check if at least one black l was found ; if wasn't found [ebp-12] == [ebp-16], because pointer was not incremented
+    mov ebx, [ebp-16]              ; ebx is used as temporary register here
+    cmp [ebp-12], ebx
+    je endOfChecking
 
-; checkInterNonBlackL
-; checkInterNonBlackHorizontal
-; checkInterNonBlackVertical
+checkNonBlackInnerL:
+    mov eax, eax 
+    ; check horizontal 
+
+    ; check vertical 
+
+
 
     
 
