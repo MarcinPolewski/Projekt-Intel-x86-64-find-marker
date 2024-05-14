@@ -149,8 +149,82 @@ pixelNonBlack2:
     test edi, edi
     jnz checkNonWhiteLOuterVertical
 
-endOfCheckingOuterNonBlackL:
+endOfCheckingOuterNonBlackL:                    ; at this point white, outer L-shape has been found - continue checking
 
+checkBlackLLoop:                                ; at this point white, outer L-shape is correct ; checks if blackL, starting at [ebp-16] is black
+    mov edi, DWORD[ebp-20]                      ; load right length to check horizontally
+    mov eax, DWORD[ebp-16]                      ; load right pointer
+
+checkBlackLHorizontal:                          ; loop that checks if horizontal line is black 
+    cmp DWORD[eax], 0           ; check if pixel is black
+    je exitBlackLLoop
+    inc eax
+    cmp DWORD[eax], 0
+    je exitBlackLLoop
+    inc eax
+    cmp DWORD[eax], 0
+    je exitBlackLLoop
+    inc eax
+
+    ; pointer is already adjusted 
+    dec edi                     ; adjust counter
+    test edi, edi
+    jnz checkBlackLHorizontal    ; jump if still there are pixels to check
+
+checkPixelAtTheEndOfHorizontal:              ; checks if next pixel is not black
+    cmp DWORD[eax], 0             
+    jne endOfBlackLHorizontalLoop    
+    inc eax
+    cmp DWORD[eax], 0
+    jne endOfBlackLHorizontalLoop    
+    inc eax
+    cmp DWORD[eax], 0
+    jne endOfBlackLHorizontalLoop    
+
+    jmp exitBlackLLoop                          ; jump if pixel at the end of line is black
+
+endOfBlackLHorizontalLoop:                      ; horizontal line in black L-shape is good
+    mov edi, DWORD[ebp-24]                      ; load right length to check vertically
+    mov eax, DWORD[ebp-16]                      ; load right pointer
+
+checkBlackLVertical:          ; loop that checks if vertical line is black
+    cmp DWORD[eax], 0           ; check if pixel is black
+    je exitBlackLLoop
+    cmp DWORD[eax+1], 0
+    je exitBlackLLoop
+    cmp DWORD[eax+2], 0
+    je exitBlackLLoop
+
+    sub eax, 3*WIDTH               ; increment pointer ; pointer -=3*WIDTH
+    dec edi                         ; decrement number of elements to check
+    test edi, edi 
+    jnz checkBlackLVertical            ; jump if pixels left to check
+
+checkPixelAtTheEndOfVertical:              ; checks if next pixel is not black
+    cmp DWORD[eax], 0             
+    jne endOfBlackLVerticalLoop    
+    cmp DWORD[eax+1], 0
+    jne endOfBlackLVerticalLoop    
+    cmp DWORD[eax+2], 0
+    jne endOfBlackLVerticalLoop    
+
+    jmp exitBlackLLoop                          ; jump if pixel at the end of line is black
+
+endOfBlackLVerticalLoop:                ; at this point black L has been checked and it was correct
+
+    ; adjust lenght of next L-shape
+    ; adjust height of next L-shpa 
+    ; adjust pointer
+
+    ; quit chekcing if vertical lenght == 0 <- thats rectangle 
+    jmp checkBlackLLoop
+
+exitBlackLLoop:
+    mov eax, eax                        ; to delete !!!!!!!!!!!!!!!!!!
+
+; checkInterNonBlackL
+; checkInterNonBlackHorizontal
+; checkInterNonBlackVertical
 
     
 
