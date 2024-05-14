@@ -24,6 +24,8 @@ find_markers:
     push esi 
     push ebx
 
+    mov [ebp-8], 0              ; set  counter of found markers to 0 
+
 processBMP:
     mov edx, HEIGHT         
     sub edx, 1                  ; edx is iterator over rows ; i
@@ -231,11 +233,54 @@ exitBlackLLoop:
     cmp [ebp-12], ebx
     je endOfChecking
 
-checkNonBlackInnerL:
-    mov eax, eax 
-    ; check horizontal 
+checkNonBlackInnerL:                    ; check if inner L-shape does not have black pixels
+    mov eax, DWORD[ebp-16]              ; load pointer
+    mov edi, DWORD[ebp-20]              ; load lenght
+    add edi, 1                          ; we need to check one more pixel than if it would be black L
 
-    ; check vertical 
+checkNonBlackInnerHorizontal:
+    ; check if pixel is not black 
+    add eax, 3
+    cmp DWORD[eax-1], 0
+    jne pixelNonBlack3
+    cmp DWORD[eax-2], 0
+    jne pixelNonBlack3
+    cmp DWORD[eax-3], 0
+    jne pixelNonBlack3
+
+    jmp endOfChecking                         ; pixel is black, end checking
+pixelNonBlack3:
+    dec edi                                     ; decrement number of pixels to check
+    test edi, edi
+    jnz checkNonBlackInnerHorizontal            ; jump if there are pixels left to check
+
+endOfNonBlackInnerHorizontal:                   ; at this point horizontal, inner white line is good
+    mov eax, DWORD[ebp-16]              ; load pointer
+    mov edi, DWORD[ebp-24]              ; load lenght
+    add edi, 1                          ; we need to check one more pixel than if it would be black L
+
+checkNonBlackInnerVertical:
+    cmp DWORD[eax], 0                         ; check if pixel is not black
+    jne pixelNonBlack4
+    cmp DWORD[eax+1], 0
+    jne pixelNonBlack4
+    cmp DWORD[eax+2], 0
+    jne pixelNonBlack4
+
+    jmp endOfChecking                         ; pixel is black, end checking
+
+pixelNonBlack4:                                 ; at this point pixel is definitelly  not black
+    sub eax, 3*WIDTH                            ; increment pointer ; pointer -= 3*width
+    dec  edi                                    ; decrement counter of elements to check 
+
+    test edi, edi                               ; jump if there are pixels left to check
+    jnz checkNonBlackInnerVertical
+
+answerFound:                                    
+    ; add column to list
+    ; add row to list
+    inc DWORD[ebp-8]                            ; increment counter of markers 
+
 
 
 
