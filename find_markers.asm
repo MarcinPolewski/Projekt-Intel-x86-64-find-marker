@@ -15,7 +15,9 @@ find_markers:
     sub esp, 4                  ; local variable at[ebp-4] - stores calculated length of horizontal line
     sub esp, 4                  ; local variable at[ebp-8] - counter of found markers 
     sub esp, 4                  ; local variable at[ebp-12] - stores pointer to pixel of coordinates[i,j], where i is row idx and j is column idx
-    sub esp, 4                  ; local variable at[ebp-12] - currentIdx, pointer to top left pixel of currently checked L-shape
+    sub esp, 4                  ; local variable at[ebp-16] - currentIdx, pointer to top left pixel of currently checked L-shape
+    sub esp, 4                  ; local varaible at[ebp-20] - length of currently check L-shape
+    sub esp, 4                  ; local varaible at[ebp-24] - height  of currently check L-shape
     
     ; store saved registers 
     push edi 
@@ -40,25 +42,122 @@ columnLoop:
     mov DWORD[ebp-12], eax      ; store calculated pointer on stack
 
 checkIfBlack:                   ; check if current pixel is black, if not continue with loops
-    test [eax], [eax]
+    cmp DWORD[eax], 0           ; test [eax], [eax] does not work and might have not been faster
+    je continueLoops
+    inc eax
+    cmp DWORD[eax], 0
     jnz continueLoops
     inc eax
-    test [eax], [eax]
-    jnz continueLoops
-    inc eax
-    test [eax], [eax]
+    cmp DWORD[eax], 0
     jnz continueLoops
     inc eax
 
 calcLength:                     ; calculate horizontal black line length
     ; if this point is reached pixel must be black, pointer is already incemenented and counter set to one
-    mov edi, 1               ; increment counter of horizontal black line length
+    mov edi, 1               ; set counter of horizontal black line length to 1
+    
+    mov ebx, WIDTH              ; ebx hold how many iterations left till end of line
+    sub ebx, ecx                ; ebx == WIDTH - currentColumn
+    sub ebx, 1                  ; ebx == WIDTH - currentColumn - 1
+
+calcLengthLoop:
+    cmp ebx,0
+    je endOfChecking        ; quit if is zero
+
+    cmp DWORD[eax], 0           ; check if pixel is black, if not quit
+    je exitCalcLengthLoop
+    inc eax
+    cmp DWORD[eax], 0
+    jnz exitCalcLengthLoop
+    inc eax
+    cmp DWORD[eax], 0
+    jnz exitCalcLengthLoop
+    inc eax
+
+    inc edi                  ; increment counter of black pixel
+    dec ebx                 ; decrement counter of how many iterations left in this row 
+
+    jmp calcLengthLoop
+    
+exitCalcLengthLoop:             ; length of horizontal black line has been calculated
+    ; check if end of line has been reached - nie trzeba, wtedy odrazu przeskakjemy do endOfChecking
+    
+    ; check parity
+    test edi, 1
+    jnz endOfChecking                        ; jump if length of horizontal line is odd - marker is not correct 
+
+    mov DWORD[ebp-4], edi                    ; store length on stack 
+    mov DWORD[ebp-20], edi  
+    
+    mov esi, edi                             
+    shr esi, 1                              ; divide length by 2, now edi has anticipate length fof vertical line
+    mov DWORD[ebp-24], esi                  ; store legnth of vertical line on stack 
+
+    ; check if vertical line will fit (we must have at least esi+1 rows left to bottom) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+checkNonWhiteLOuter:                        ; check if L-shape above marker does not have black pixels 
+    ; adjust it, so it point to pixel to the top and left from found black pixel 
+    mov eax, DWORD[ebp-12]                  ; load previous pointer from stack to eax 
+    sub eax, 3                              ; adjust pointer ; pointer = pointer -3  + 3*WIDHT
+    add eax, 3*WIDTH                        ; lea is not right instruction, because we use multiplication of 2 instant arguments
+    
+    ; load anticipated length of horizontal nonBlack line to register
+    ; wanted length is already in edi, just need to add 2 to it
+    add edi, 2
+
+checkNonWhiteLOuterHorizontal:               ; checks horizontal line of non black L-shape above marker
+    ; check if pixel is not black - at least on color must not be zero
+    add eax, 3
+    cmp DWORD[eax-1], 0
+    jne pixelNonBlack1
+    cmp DWORD[eax-2], 0
+    jne pixelNonBlack1
+    cmp DWORD[eax-3], 0
+    jne pixelNonBlack1
+
+    jmp endOfChecking                         ; pixel is black, end checking
+
+pixelNonBlack1:
+    dec edi                                     ; decrement how many pixels to check
+    test edi, edi
+    jnz checkNonWhiteLOuterHorizontal           ; jump there are still pixels left to check
+
+endOfCheckingNonWhiteLOuterHorizontal:          ; horizontal line is non black 
+    mov eax, DWORD[ebp-12]                  ; load previous pointer from stack to eax 
+    sub eax, 3                              ; adjust pointer ; pointer = pointer -3  + 3*WIDHT
+    add eax, 3*WIDTH                        ; lea is not right instruction, because we use multiplication of 2 instant arguments
+    
+    ; laod anticipated length
+    mov edi, DWORD[ebp-24]
+    add edi, 2      
+
+checkNonWhiteLOuterVertical:                ; checks vertical line of non black L-shape above marker
+    ; check if pixel is not black - at least on color must not be zero
+    cmp DWORD[eax], 0
+    jne pixelNonBlack2
+    cmp DWORD[eax+1], 0
+    jne pixelNonBlack2
+    cmp DWORD[eax+2], 0
+    jne pixelNonBlack2
+
+    jmp endOfChecking                         ; pixel is black, end checking
+
+pixelNonBlack2:
+    sub eax, 3*WIDTH                            ; increment pointer ; pointer -= 3*width
+    dec  edi                                    ; decrement counter of elements to check 
+
+    test edi, edi
+    jnz checkNonWhiteLOuterVertical
+
+endOfCheckingOuterNonBlackL:
 
 
+    
 
-
+endOfChecking:
+    mov eax, eax            ; to delete !!!!!!!!!!!
 continueLoops:
-
+    mov eax, eax            ; to delete !!!!!!!!!!!
 
 endFunction:
 
