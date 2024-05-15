@@ -45,13 +45,13 @@ columnLoop:
 
 checkIfBlack:                   ; check if current pixel is black, if not continue with loops
     cmp DWORD[eax], 0           ; test [eax], [eax] does not work and might have not been faster
-    je continueLoops
+    jne continueLoops
     inc eax
     cmp DWORD[eax], 0
-    jnz continueLoops
+    jne continueLoops
     inc eax
     cmp DWORD[eax], 0
-    jnz continueLoops
+    jne continueLoops
     inc eax
 
 calcLength:                     ; calculate horizontal black line length
@@ -64,16 +64,16 @@ calcLength:                     ; calculate horizontal black line length
 
 calcLengthLoop:
     cmp ebx,0
-    je endOfChecking        ; quit if is zero
+    je exitCalcLengthLoop        ; quit if is zero - PROBLEM, NIE JEST ZALADOWANA DLUGOSC NA STOS
 
     cmp DWORD[eax], 0           ; check if pixel is black, if not quit
-    je exitCalcLengthLoop
+    jne exitCalcLengthLoop
     inc eax
     cmp DWORD[eax], 0
-    jnz exitCalcLengthLoop
+    jne exitCalcLengthLoop
     inc eax
     cmp DWORD[eax], 0
-    jnz exitCalcLengthLoop
+    jne exitCalcLengthLoop
     inc eax
 
     inc edi                  ; increment counter of black pixel
@@ -84,12 +84,18 @@ calcLengthLoop:
 exitCalcLengthLoop:             ; length of horizontal black line has been calculated
     ; check if end of line has been reached - nie trzeba, wtedy odrazu przeskakjemy do endOfChecking
     
+    ; store on stack calculated lengths
+    mov DWORD[ebp-4], edi                    ; store length on stack 
+    mov DWORD[ebp-20], edi  
+
+    ; check if end of line has been reached
+    cmp ebx,0
+    je endOfChecking
+
     ; check parity
     test edi, 1
     jnz endOfChecking                        ; jump if length of horizontal line is odd - marker is not correct 
 
-    mov DWORD[ebp-4], edi                    ; store length on stack 
-    mov DWORD[ebp-20], edi  
     
     mov esi, edi                             
     shr esi, 1                              ; divide length by 2, now edi has anticipate length fof vertical line
