@@ -26,6 +26,30 @@ Solution is written in "program.asm". For development RARS simulator was used. W
 - check if L-shape below last black L-shape is  white, if it's not continue with the loop 
 - print found result
 
+# What was replaced to make it compatible with x86-64 in comparison to x86-32
+x86_location x86-64_location 
+
+ebp rbp
+esp rsp
+
+eax rax
+ecx rcx
+edx r8
+ebx r9
+esi r10
+edi r11
+
+DWORD[ebp-4] r12    <- to push
+DWORD[ebp-8] r13     <- to push
+DWORD[ebp-12] r14   <- to push
+DWORD[ebp-16] r15   <- to push
+DWORD[ebp-20] ebx   <- to push
+DWORD[ebp-24] qword[ebp-8]
+
+DWORD[rbp+8] rdi
+DWORD[rbp+12] rsi
+DWORD[rbp+16] rdx
+
 # What is stored in registeres:
 iteracja pentli:
 - EAX - do liczenia idx, potem idx ląduje na stosie, potem uzywany jako current pointer
@@ -63,3 +87,5 @@ do iteracji poziomej:
 
 # ENCOUNTERED PROBLEMS
 - used DWORD instead of BYTE while working with bytes 
+
+- wszystko działa oprócz sprawdzania wewnetrznej L-ki
