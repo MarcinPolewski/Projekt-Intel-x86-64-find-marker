@@ -166,13 +166,13 @@ checkBlackLLoop:                                ; at this point white, outer L-s
 
 checkBlackLHorizontal:                          ; loop that checks if horizontal line is black 
     cmp BYTE[eax], 0           ; check if pixel is black
-    je exitBlackLLoop
+    jne exitBlackLLoop
     inc eax
     cmp BYTE[eax], 0
-    je exitBlackLLoop
+    jne exitBlackLLoop
     inc eax
     cmp BYTE[eax], 0
-    je exitBlackLLoop
+    jne exitBlackLLoop
     inc eax
 
     ; pointer is already adjusted 
@@ -198,11 +198,11 @@ endOfBlackLHorizontalLoop:                      ; horizontal line in black L-sha
 
 checkBlackLVertical:          ; loop that checks if vertical line is black
     cmp BYTE[eax], 0           ; check if pixel is black
-    je exitBlackLLoop
+    jne exitBlackLLoop
     cmp BYTE[eax+1], 0
-    je exitBlackLLoop
+    jne exitBlackLLoop
     cmp BYTE[eax+2], 0
-    je exitBlackLLoop
+    jne exitBlackLLoop
 
     sub eax, 3*WIDTH               ; increment pointer ; pointer -=3*WIDTH
     dec edi                         ; decrement number of elements to check
@@ -285,7 +285,6 @@ pixelNonBlack4:                                 ; at this point pixel is definit
 
 answerFound:                                    
     ; add column to list
-    ; instrucka lead mov
     ; obliczyć przesunięcie w ebx, potem dodać je do ebp+12
     mov eax, DWORD[ebp+12]                           ; load pointer to x positions
     mov ebx, DWORD[ebp-8]                            ; count of markers
@@ -295,7 +294,7 @@ answerFound:
     ; esi - calculate row here 
     mov esi, HEIGHT - 1
     sub esi, edx                                    ; row(esi) = HEIGHT - rowIdx - 1
-    mov eax, DWORD[ebp+12]                          ; load pointer to y_positions
+    mov eax, DWORD[ebp+16]                          ; load pointer to y_positions
     mov DWORD[eax + 4*ebx], esi                     ; add to array calualted row
     
     inc DWORD[ebp-8]                            ; increment counter of markers 
