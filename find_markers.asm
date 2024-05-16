@@ -42,6 +42,7 @@ columnLoop:
 
     ; store result on stack 
     mov DWORD[ebp-12], eax      ; store calculated pointer on stack
+    mov DWORD[ebp-16], eax      ; store current pointer on stack
 
 checkIfBlack:                   ; check if current pixel is black, if not continue with loops
     cmp DWORD[eax], 0           ; test [eax], [eax] does not work and might have not been faster
@@ -64,8 +65,8 @@ calcLength:                     ; calculate horizontal black line length
 
 calcLengthLoop:
     cmp ebx,0
-    je exitCalcLengthLoop        ; quit if is zero - PROBLEM, NIE JEST ZALADOWANA DLUGOSC NA STOS
-
+    je exitCalcLengthLoop        ; quit if is zero 
+    
     cmp DWORD[eax], 0           ; check if pixel is black, if not quit
     jne exitCalcLengthLoop
     inc eax
@@ -300,7 +301,7 @@ answerFound:
     inc DWORD[ebp-8]                            ; increment counter of markers 
 
 endOfChecking:
-    add ecx,DWORD[ebp-4]                                    ; adjust column pointer 
+    add ecx,DWORD[ebp-4]                                    ; adjust column pointer, by adding lenght of found horizontal line
     dec ecx                                        ; -1, because in next step +1 will be added
 continueLoops:
     inc ecx
