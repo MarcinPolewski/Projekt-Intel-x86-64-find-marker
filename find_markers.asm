@@ -38,7 +38,7 @@ columnLoop:
     imul rax, WIDTH                         ; rax == WIDTH*rowIdx
     add rax, rcx                            ; rax == WIDTH*rowIdx + columnIdx
     imul rax, 3
-    add rax, DWORD[rbp+8]                   ; now rax pointer to pixel in image 
+    add rax, qword[rbp+8]                   ; now rax pointer to pixel in image 
 
     ; store result on stack 
     mov r10, rax                  ; store calculated pointer on stack
@@ -286,16 +286,16 @@ pixelNonBlack4:                             ; at this point pixel is definitelly
 answerFound:                                    
     ; add column to list
     ; obliczyć przesunięcie w rbx, potem dodać je do rbp+12
-    mov rax, DWORD[rbp+12]                  ; load pointer to x positions
+    mov rax, qword[rbp+12]                  ; load pointer to x positions
     mov rbx, r9                   ; count of markers
-    mov DWORD[rax + 4*rbx], rcx             ; [baseAddressOfArray + 4*countOfMarkers]
+    mov qword[rax + 4*rbx], rcx             ; [baseAddressOfArray + 4*countOfMarkers]
 
     ; add row to list
     ; rsi - calculate row here 
     mov rsi, HEIGHT - 1
     sub rsi, rdx                            ; row(rsi) = HEIGHT - rowIdx - 1
-    mov rax, DWORD[rbp+16]                  ; load pointer to y_positions
-    mov DWORD[rax + 4*rbx], rsi             ; add to array calualted row
+    mov rax, qword[rbp+16]                  ; load pointer to y_positions
+    mov qword[rax + 4*rbx], rsi             ; add to array calualted row
     
     inc r9                        ; increment counter of markers 
 
