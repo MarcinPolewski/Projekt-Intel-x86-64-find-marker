@@ -85,7 +85,7 @@ exitCalcLengthLoop:                         ; length of horizontal black line ha
     
     ; store on stack calculated lengths
     mov r12, r11                   ; store length on stack 
-    mov r9, r11  
+    mov rbx, r11  
 
     ; check if end of line has been reached
     cmp r9,0
@@ -159,7 +159,7 @@ pixelNonBlack2:
 endOfCheckingOuterNonBlackL:                ; at this point white, outer L-shape has been found - continue checking
 
 checkBlackLLoop:                            ; at this point white, outer L-shape is correct ; checks if blackL, starting at [rbp-16] is black
-    mov r11, r9                  ; load right length to check horizontally
+    mov r11, rbx                  ; load right length to check horizontally
     mov rax, r15                  ; load right pointer
 
 checkBlackLHorizontal:                      ; loop that checks if horizontal line is black 
@@ -219,7 +219,7 @@ checkPixelAtTheEndOfVertical:               ; checks if next pixel is not black
 
 endOfBlackLVerticalLoop:                    ; at this point black L has been checked and it was correct
 
-    dec r9                       ; adjust lenght of next L-shape
+    dec rbx                       ; adjust lenght of next L-shape
     dec qword[rbp-8]                       ; adjust height of next L-shpa 
     
     ; adjust pointer
@@ -240,7 +240,7 @@ exitBlackLLoop:
 
 checkNonBlackInnerL:                        ; check if inner L-shape does not have black pixels
     mov rax, r15                  ; load pointer
-    mov r11, r9                  ; load lenght
+    mov r11, rbx                  ; load lenght
     add r11, 1                              ; we need to check one more pixel than if it would be black L
 
 checkNonBlackInnerHorizontal:
