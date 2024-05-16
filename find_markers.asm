@@ -45,13 +45,13 @@ columnLoop:
     mov DWORD[ebp-16], eax      ; store current pointer on stack
 
 checkIfBlack:                   ; check if current pixel is black, if not continue with loops
-    cmp DWORD[eax], 0           ; test [eax], [eax] does not work and might have not been faster
+    cmp BYTE[eax], 0           ; test [eax], [eax] does not work and might have not been faster
     jne continueLoops
     inc eax
-    cmp DWORD[eax], 0
+    cmp BYTE[eax], 0
     jne continueLoops
     inc eax
-    cmp DWORD[eax], 0
+    cmp BYTE[eax], 0
     jne continueLoops
     inc eax
 
@@ -67,13 +67,13 @@ calcLengthLoop:
     cmp ebx,0
     je exitCalcLengthLoop        ; quit if is zero 
     
-    cmp DWORD[eax], 0           ; check if pixel is black, if not quit
+    cmp BYTE[eax], 0           ; check if pixel is black, if not quit
     jne exitCalcLengthLoop
     inc eax
-    cmp DWORD[eax], 0
+    cmp BYTE[eax], 0
     jne exitCalcLengthLoop
     inc eax
-    cmp DWORD[eax], 0
+    cmp BYTE[eax], 0
     jne exitCalcLengthLoop
     inc eax
 
@@ -117,11 +117,11 @@ checkNonWhiteLOuter:                        ; check if L-shape above marker does
 checkNonWhiteLOuterHorizontal:               ; checks horizontal line of non black L-shape above marker
     ; check if pixel is not black - at least on color must not be zero
     add eax, 3
-    cmp DWORD[eax-1], 0
+    cmp BYTE[eax-1], 0
     jne pixelNonBlack1
-    cmp DWORD[eax-2], 0
+    cmp BYTE[eax-2], 0
     jne pixelNonBlack1
-    cmp DWORD[eax-3], 0
+    cmp BYTE[eax-3], 0
     jne pixelNonBlack1
 
     jmp endOfChecking                         ; pixel is black, end checking
@@ -142,11 +142,11 @@ endOfCheckingNonWhiteLOuterHorizontal:          ; horizontal line is non black
 
 checkNonWhiteLOuterVertical:                ; checks vertical line of non black L-shape above marker
     ; check if pixel is not black - at least on color must not be zero
-    cmp DWORD[eax], 0
+    cmp BYTE[eax], 0
     jne pixelNonBlack2
-    cmp DWORD[eax+1], 0
+    cmp BYTE[eax+1], 0
     jne pixelNonBlack2
-    cmp DWORD[eax+2], 0
+    cmp BYTE[eax+2], 0
     jne pixelNonBlack2
 
     jmp endOfChecking                         ; pixel is black, end checking
@@ -165,13 +165,13 @@ checkBlackLLoop:                                ; at this point white, outer L-s
     mov eax, DWORD[ebp-16]                      ; load right pointer
 
 checkBlackLHorizontal:                          ; loop that checks if horizontal line is black 
-    cmp DWORD[eax], 0           ; check if pixel is black
+    cmp BYTE[eax], 0           ; check if pixel is black
     je exitBlackLLoop
     inc eax
-    cmp DWORD[eax], 0
+    cmp BYTE[eax], 0
     je exitBlackLLoop
     inc eax
-    cmp DWORD[eax], 0
+    cmp BYTE[eax], 0
     je exitBlackLLoop
     inc eax
 
@@ -181,13 +181,13 @@ checkBlackLHorizontal:                          ; loop that checks if horizontal
     jnz checkBlackLHorizontal    ; jump if still there are pixels to check
 
 checkPixelAtTheEndOfHorizontal:              ; checks if next pixel is not black
-    cmp DWORD[eax], 0             
+    cmp BYTE[eax], 0             
     jne endOfBlackLHorizontalLoop    
     inc eax
-    cmp DWORD[eax], 0
+    cmp BYTE[eax], 0
     jne endOfBlackLHorizontalLoop    
     inc eax
-    cmp DWORD[eax], 0
+    cmp BYTE[eax], 0
     jne endOfBlackLHorizontalLoop    
 
     jmp exitBlackLLoop                          ; jump if pixel at the end of line is black
@@ -197,11 +197,11 @@ endOfBlackLHorizontalLoop:                      ; horizontal line in black L-sha
     mov eax, DWORD[ebp-16]                      ; load right pointer
 
 checkBlackLVertical:          ; loop that checks if vertical line is black
-    cmp DWORD[eax], 0           ; check if pixel is black
+    cmp BYTE[eax], 0           ; check if pixel is black
     je exitBlackLLoop
-    cmp DWORD[eax+1], 0
+    cmp BYTE[eax+1], 0
     je exitBlackLLoop
-    cmp DWORD[eax+2], 0
+    cmp BYTE[eax+2], 0
     je exitBlackLLoop
 
     sub eax, 3*WIDTH               ; increment pointer ; pointer -=3*WIDTH
@@ -210,11 +210,11 @@ checkBlackLVertical:          ; loop that checks if vertical line is black
     jnz checkBlackLVertical            ; jump if pixels left to check
 
 checkPixelAtTheEndOfVertical:              ; checks if next pixel is not black
-    cmp DWORD[eax], 0             
+    cmp BYTE[eax], 0             
     jne endOfBlackLVerticalLoop    
-    cmp DWORD[eax+1], 0
+    cmp BYTE[eax+1], 0
     jne endOfBlackLVerticalLoop    
-    cmp DWORD[eax+2], 0
+    cmp BYTE[eax+2], 0
     jne endOfBlackLVerticalLoop    
 
     jmp exitBlackLLoop                          ; jump if pixel at the end of line is black
@@ -248,11 +248,11 @@ checkNonBlackInnerL:                    ; check if inner L-shape does not have b
 checkNonBlackInnerHorizontal:
     ; check if pixel is not black 
     add eax, 3
-    cmp DWORD[eax-1], 0
+    cmp BYTE[eax-1], 0
     jne pixelNonBlack3
-    cmp DWORD[eax-2], 0
+    cmp BYTE[eax-2], 0
     jne pixelNonBlack3
-    cmp DWORD[eax-3], 0
+    cmp BYTE[eax-3], 0
     jne pixelNonBlack3
 
     jmp endOfChecking                         ; pixel is black, end checking
@@ -267,11 +267,11 @@ endOfNonBlackInnerHorizontal:                   ; at this point horizontal, inne
     add edi, 1                          ; we need to check one more pixel than if it would be black L
 
 checkNonBlackInnerVertical:
-    cmp DWORD[eax], 0                         ; check if pixel is not black
+    cmp BYTE[eax], 0                         ; check if pixel is not black
     jne pixelNonBlack4
-    cmp DWORD[eax+1], 0
+    cmp BYTE[eax+1], 0
     jne pixelNonBlack4
-    cmp DWORD[eax+2], 0
+    cmp BYTE[eax+2], 0
     jne pixelNonBlack4
 
     jmp endOfChecking                         ; pixel is black, end checking
