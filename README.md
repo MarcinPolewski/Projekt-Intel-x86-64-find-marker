@@ -1,5 +1,5 @@
 # Task
-Find a bitmap a marker of given proportions using RISC-V assembly language. Print to console row and column of the point, where lines cross. Marker is an "L", rotatet by 90 degrees to the right.
+Find a bitmap a marker of given proportions using x86-64 assembly language. Print to console row and column of the point, where lines cross. Marker is an "L", rotatet by 90 degrees to the right.
 
 ### Bitmap parameters:
 - height: 240px
@@ -8,9 +8,6 @@ Find a bitmap a marker of given proportions using RISC-V assembly language. Prin
 ### Marker parameters: 
 - When marker's height==x, then marker's width==2x
 - Must have 
-
-# General idea - how it works
-Solution is written in "program.asm". For development RARS simulator was used. When program is started it open source.bmp file, looks for markers and prints their position(top left corner) to the console
 
 # Implementation/algorith 
 - iterate over image untill black pixel is found
